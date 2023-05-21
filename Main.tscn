@@ -1,0 +1,60 @@
+[gd_scene load_steps=8 format=2]
+
+[ext_resource path="res://Main.gd" type="Script" id=1]
+[ext_resource path="res://Mob.tscn" type="PackedScene" id=2]
+[ext_resource path="res://HUD.tscn" type="PackedScene" id=4]
+[ext_resource path="res://art/house-in-a-forest-loop.ogg" type="AudioStream" id=5]
+[ext_resource path="res://art/game-over.wav" type="AudioStream" id=6]
+[ext_resource path="res://TopDownExample/MetaBoyTopDown.tscn" type="PackedScene" id=7]
+
+[sub_resource type="Curve2D" id=1]
+_data = {
+"points": PoolVector2Array( 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 480, 0, 0, 0, 0, 0, 481.507, 728.113, 0, 0, 0, 0, 0, 720, 0, 0, 0, 0, 0, 0 )
+}
+
+[node name="Main" type="Node"]
+script = ExtResource( 1 )
+mob_scene = ExtResource( 2 )
+
+[node name="ColorRect" type="ColorRect" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color( 0.188235, 0.329412, 0.34902, 1 )
+
+[node name="MobPath" type="Path2D" parent="."]
+scale = Vector2( 1.32708, 0.493056 )
+curve = SubResource( 1 )
+
+[node name="MobSpawnLocation" type="PathFollow2D" parent="MobPath"]
+
+[node name="MobTimer" type="Timer" parent="."]
+wait_time = 0.5
+
+[node name="HUD" parent="." instance=ExtResource( 4 )]
+
+[node name="ScoreTimer" type="Timer" parent="."]
+
+[node name="StartTimer" type="Timer" parent="."]
+one_shot = true
+
+[node name="StartPosition" type="Position2D" parent="."]
+position = Vector2( 318, 193 )
+
+[node name="Music" type="AudioStreamPlayer" parent="."]
+stream = ExtResource( 5 )
+volume_db = -80.0
+
+[node name="DeathSound" type="AudioStreamPlayer" parent="."]
+stream = ExtResource( 6 )
+
+[node name="MetaBoyTopDown" parent="." instance=ExtResource( 7 )]
+position = Vector2( 317, 154 )
+collision_mask = 3
+
+[node name="Area2D" type="Area2D" parent="MetaBoyTopDown"]
+collision_mask = 3
+
+[connection signal="timeout" from="MobTimer" to="." method="_on_Timer_timeout"]
+[connection signal="start_game" from="HUD" to="." method="new_game"]
+[connection signal="timeout" from="ScoreTimer" to="." method="_on_ScoreTimer_timeout"]
+[connection signal="hit" from="MetaBoyTopDown" to="." method="game_over"]
